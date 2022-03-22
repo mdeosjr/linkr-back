@@ -1,4 +1,3 @@
-import connection from '../db.js';
 import bcrypt from 'bcrypt';
 import { usersRepository } from '../repositories/usersRepository.js';
 
@@ -7,7 +6,7 @@ export async function createUser(req, res) {
 
     try {
         const existingUser = await usersRepository.find(email);
-        if (existingUser.rowCount > 0) return res.sendStatus(409);
+        if (existingUser.rowCount > 0) return res.status(409).send("Usuário já cadastrado!");
 
         const passwordHash = bcrypt.hashSync(password, 10);
 
