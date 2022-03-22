@@ -36,5 +36,5 @@ CREATE TABLE "likes"(
 CREATE TABLE "sessions"(
     "id" SERIAL NOT NULL PRIMARY KEY,
     "userId" INTEGER NOT NULL REFERENCES "users"("id"),
-    "token" TEXT NOT NULL
+    "token" TEXT NOT NULL UNIQUE
 );
