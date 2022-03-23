@@ -20,6 +20,7 @@
     "express": "^4.17.3",
     "joi": "^17.6.0",
     "pg": "^8.7.3",
+    "url-metadata": "^2.5.0",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
