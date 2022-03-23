@@ -15,6 +15,7 @@ export async function login(req, res) {
             await usersRepository.createSession(user.rows[0].id, token);
             
             delete user.rows[0].password;
+            user.rows[0].token = token;
             return res.status(200).send(user.rows[0]);
         }
         return res.status(401).send("Usuário e/ou senha incorretos!");
