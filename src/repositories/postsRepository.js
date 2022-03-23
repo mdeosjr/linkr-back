@@ -22,9 +22,26 @@ async function getTimeline() {
     ORDER BY date DESC LIMIT 20`);
 }
 
+async function selectPost(id, userId){
+    return connection.query(`
+    SELECT * 
+        FROM posts
+        WHERE id=$1
+        AND "userId"=$2
+    `,[id,userId]);
+}
+async function deletePost(id){
+    return connection.query(`
+    DELETE 
+        FROM posts
+        WHERE id=$1
+    `,[id]);
+}
 export const postsRepository = {
   create,
   getTimeline,
+  selectPost,
+  deletePost
 };
 
 // SELECT * FROM posts ORDER BY date DESC LIMIT 20`
