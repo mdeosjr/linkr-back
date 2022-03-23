@@ -27,7 +27,7 @@ export async function deletePost(req,res){
         await postsRepository.deletePost(id);
         res.sendStatus(200);
     } catch (error) {
-        console.log(error);
+       
         res.sendStatus(500);
     }
 }
