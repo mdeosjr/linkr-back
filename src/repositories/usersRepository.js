@@ -18,8 +18,22 @@ async function createSession(userId, token) {
             `, [userId, token]);
 }
 
+async function findSession(token) {
+    return connection.query(`
+        SELECT * FROM sessions WHERE token=$1
+        `, [token]);
+}
+
+async function findUser(userId) {
+    return connection.query(`
+        SELECT * FROM users WHERE id=$1
+    `, [userId])
+}
+
 export const usersRepository = {
     find,
     create,
-    createSession
+    createSession,
+    findSession,
+    findUser
 }
