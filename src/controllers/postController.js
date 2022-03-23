@@ -8,6 +8,7 @@ export async function submitPost(req, res) {
             link, text, userId
         }
         await postsRepository.create(post);
+        res.sendStatus(201);
 
     } catch (error) {
         console.log(error);
