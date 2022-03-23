@@ -3,7 +3,7 @@ export default function validateSchema(schema) {
     const validation = schema.validate(req.body);
     
     if (validation.error) {
-      return res.sendStatus(422);
+      return res.status(422).send("Todos os campos precisam estar preenchidos!");
     }
     
     next();
