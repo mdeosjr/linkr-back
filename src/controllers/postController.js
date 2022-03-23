@@ -33,7 +33,8 @@ export async function getTimelinePosts(req, res) {
       });
     }
     res.send(postsResponse);
-  } catch {
+  } catch(error) {
+    console.log(error);
     res.sendStatus(500);
   }
 }
