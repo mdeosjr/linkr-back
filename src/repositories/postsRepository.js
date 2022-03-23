@@ -7,3 +7,7 @@ async function create(post) {
         VALUES ($1, $2, $3)
     `, [post.link, post.text, post.userId]);
 }
+
+export const postsRepository = {
+    create
+}
