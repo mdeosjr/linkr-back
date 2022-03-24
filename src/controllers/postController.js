@@ -38,3 +38,18 @@ export async function getTimelinePosts(req, res) {
     res.sendStatus(500);
   }
 }
+
+export async function deletePost(req,res){
+    const {id}=req.params;
+    try {
+        const result=await postsRepository.selectPost (id,res.locals.user.id);
+        if(result.rowCount===0){
+           return res.sendStatus(401);
+        }
+        await postsRepository.deletePost(id);
+        res.sendStatus(200);
+    } catch (error) {
+        console.log(error);
+        res.sendStatus(500);
+    }
+} 
