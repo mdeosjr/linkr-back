@@ -37,11 +37,29 @@ async function deletePost(id){
         WHERE id=$1
     `,[id]);
 }
+
+async function findPost(id){
+  return connection.query(`
+    SELECT * FROM posts
+    WHERE id = $1
+  `, [id]);
+}
+
+async function updatePost(id, text) {
+  return connection.query(`
+    UPDATE posts
+    SET "textPost"=$1
+    WHERE id = $2
+  `, [text, id]);
+}
+
 export const postsRepository = {
   create,
   getTimeline,
   selectPost,
-  deletePost
+  deletePost,
+  findPost,
+  updatePost
 };
 
 // SELECT * FROM posts ORDER BY date DESC LIMIT 20`
