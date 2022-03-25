@@ -122,3 +122,21 @@ export async function deletePost(req, res) {
     res.sendStatus(500);
   }
 }
+
+export async function getPostByHashtag(req,res){
+    const {hashtag}=req.params;
+    
+    try {
+       const result= await postsRepository.getPostByHashtag(hashtag)
+       if(result.rowCount===0){
+        return res.sendStatus(404);
+       }
+       const [posts]=result.rows;
+       
+       res.send(posts);
+        
+    } catch (error) {
+        console.log(error);
+        res.sendStatus(500);
+    }
+}
