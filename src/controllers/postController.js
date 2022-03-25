@@ -12,7 +12,7 @@ export async function updatePost(req, res) {
         }
         if(post.userId != res.locals.user.id){
             console.log("FOI AQUI NO updatePost")
-            return res.sendStatus(422);
+            return res.sendStatus(433);
         }
         await postsRepository.updatePost(id, text);
         res.sendStatus(200);
@@ -75,3 +75,13 @@ export async function deletePost(req, res) {
         res.sendStatus(500);
     }
 } 
+
+export async function getPostByHashtag(req,res){
+    const{hashtag}=req.params;
+
+    try {
+        
+    } catch (error) {
+        
+    }
+}

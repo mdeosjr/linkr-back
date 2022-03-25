@@ -53,6 +53,19 @@ async function updatePost(id, text) {
   `, [text, id]);
 }
 
+async function getPostByHashtag(hashtag){
+  return connection.query(`
+  SELECT hashtags.*,
+   posts.id AS "postId",posts.link,posts."textPost",posts."userId",posts.date
+    FROM hashtags
+      JOIN "postsHashtags"
+        ON hashtags.id="postsHashtags"."hashtagId"
+          JOIN posts
+            ON posts.id="postsHashtags"."postId";
+    WHERE hashtags."hashtagText"=$1
+  `,[hashtag]);
+}
+
 export const postsRepository = {
   create,
   getTimeline,
