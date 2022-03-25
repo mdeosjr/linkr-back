@@ -30,10 +30,19 @@ async function findUser(userId) {
     `, [userId])
 }
 
+async function getUserData(userId) {
+    return connection.query(`
+        SELECT u.name, u.image, p."userId", p.link, p."textPost" FROM users u
+            LEFT JOIN posts p ON p."userId"=u.id
+            WHERE u.id=$1
+    `, [userId])
+}
+
 export const usersRepository = {
     find,
     create,
     createSession,
     findSession,
-    findUser
+    findUser,
+    getUserData
 }
