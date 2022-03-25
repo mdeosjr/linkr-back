@@ -2,6 +2,17 @@ import bcrypt from 'bcrypt';
 import urlMetadata from "url-metadata";
 import { usersRepository } from '../repositories/usersRepository.js';
 
+export async function searchUsers(req, res) {
+    const name = req.query.name;
+    try {
+        const {rows: users} = await usersRepository.searchUsersByName(name);
+        return res.send(users);
+    } catch (error) {
+        console.log(error);
+        res.sendStatus(500);
+    }
+}
+
 export async function createUser(req, res) {
     const { name, email, password, image } = req.body;
 
