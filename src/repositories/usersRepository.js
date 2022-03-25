@@ -38,11 +38,19 @@ async function getUserData(userId) {
     `, [userId])
 }
 
+async function searchUsersByName(name) {
+    return connection.query(`
+        SELECT users.id, users.name, users.image FROM users
+        WHERE LOWER(name) LIKE LOWER('%${name}%')
+    `)
+}
+
 export const usersRepository = {
     find,
     create,
     createSession,
     findSession,
     findUser,
-    getUserData
+    getUserData,
+    searchUsersByName
 }
