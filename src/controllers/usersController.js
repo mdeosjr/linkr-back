@@ -1,4 +1,5 @@
 import bcrypt from 'bcrypt';
+import urlMetadata from "url-metadata";
 import { usersRepository } from '../repositories/usersRepository.js';
 
 export async function createUser(req, res) {
@@ -12,6 +13,43 @@ export async function createUser(req, res) {
 
         await usersRepository.create(name, email, passwordHash, image);
         res.sendStatus(201);
+    } catch (e) {
+        console.error(e);
+        res.sendStatus(500);
+    }
+}
+
+export async function getUser(req, res) {
+    const { id } = req.params;
+
+    try {
+        const user = await usersRepository.findUser(id);
+        if (user.rowCount === 0) return res.status(404).send("Usuário não existe!");
+
+        const userArray = await usersRepository.getUserData(id);
+        const name = userArray.rows[0].name;
+        const image = userArray.rows[0].image;
+
+        const postsArray = [];
+        for(const data of userArray.rows) {
+            if (data.link === null) break;
+            const metadata = await urlMetadata(data.link);
+            postsArray.push({
+                link: data.link,
+                text: data.textPost,
+                linkTitle: metadata.title,
+                linkDescription: metadata.description,
+                linkImage: metadata.image
+            }) 
+        }
+
+        const userData = {
+            name,
+            image,
+            posts: postsArray
+        }
+        
+        res.status(200).send(userData)
     } catch (e) {
         console.error(e);
         res.sendStatus(500);
