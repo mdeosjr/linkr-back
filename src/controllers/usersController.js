@@ -46,6 +46,8 @@ export async function getUser(req, res) {
             if (data.link === null) break;
             const metadata = await urlMetadata(data.link);
             postsArray.push({
+                name,
+                image,
                 link: data.link,
                 text: data.textPost,
                 linkTitle: metadata.title,
@@ -54,13 +56,13 @@ export async function getUser(req, res) {
             }) 
         }
 
-        const userData = {
-            name,
-            image,
-            posts: postsArray
-        }
-        
-        res.status(200).send(userData)
+        // const userData = {
+        //     name,
+        //     image,
+        //     posts: postsArray
+        // }
+        console.log(postsArray)
+        res.status(200).send(postsArray)
     } catch (e) {
         console.error(e);
         res.sendStatus(500);
