@@ -5,7 +5,8 @@ import {
   updatePost,
   deletePost,
   populatePostsHashtags,
-  getPostByHashtag
+  getPostByHashtag,
+  getTrendingHashtags,
 } from "../controllers/postController.js";
 import postSchema from "../schemas/postSchema.js";
 import validateSchema from "../middlewares/validateSchemaMW.js";
@@ -23,8 +24,13 @@ postRouter.post(
 );
 postRouter.get("/timeline", validateToken, getTimelinePosts);
 postRouter.delete("/post/:id", validateToken, deletePost);
-postRouter.put('/post/:id', validateToken, validateSchema(updatePostSchema), updatePost);
-postRouter.get('/hashtag/:hashtag',getPostByHashtag);
-
+postRouter.put(
+  "/post/:id",
+  validateToken,
+  validateSchema(updatePostSchema),
+  updatePost
+);
+postRouter.get("/hashtag/:hashtag", getPostByHashtag);
+postRouter.get("/trendingHashtags", validateToken, getTrendingHashtags);
 
 export default postRouter;

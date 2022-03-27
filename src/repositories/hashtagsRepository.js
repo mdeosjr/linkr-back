@@ -56,12 +56,26 @@ async function createPostsHashtagsEntry(hashtagId, postId) {
   );
 }
 
+async function getTrendingHashtags() {
+  return connection.query(
+    `
+   SELECT 
+      "hashtagId", 
+      COUNT("hashtagId") as count,
+      hashtags."hashtagText"
+    FROM "postsHashtags"
+    JOIN hashtags ON hashtags.id = "postsHashtags"."hashtagId"
+    GROUP BY "hashtagId", hashtags."hashtagText"
+    ORDER BY count DESC
+      `
+  );
+}
+
 export const hashtagsRepository = {
   findHashtag,
   createHashtag,
   getHashtagId,
   getPostId,
   createPostsHashtagsEntry,
+  getTrendingHashtags,
 };
-
-// select count("hashtagId") AS "uses" from "postsHashtags" group by "hashtagId" ORDER BY uses DESC;
