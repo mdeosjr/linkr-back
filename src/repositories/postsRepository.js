@@ -57,12 +57,15 @@ async function getPostByHashtag(hashtag){
   
   return connection.query(`
   SELECT hashtags.*,
-   posts.id AS "postId",posts.link,posts."textPost",posts."userId",posts.date
+   posts.id AS "postId",posts.link,posts."textPost",posts."userId",posts.date,users.name AS "userName",
+   users.image AS "userImage"
     FROM hashtags
       JOIN "postsHashtags"
         ON hashtags.id="postsHashtags"."hashtagId"
           JOIN posts
             ON posts.id="postsHashtags"."postId"
+			        JOIN users
+			        	ON posts."userId"=users.id
     WHERE hashtags."hashtagText"=$1
   `,[hashtag]);
 }
