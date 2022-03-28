@@ -127,25 +127,32 @@ export async function getPostByHashtag(req, res) {
   const { hashtag } = req.params;
 
   try {
-    const result = await postsRepository.getPostByHashtag(hashtag);
+    const {rows:result} = await postsRepository.getPostByHashtag(hashtag);
     if (result.rowCount === 0) {
       return res.sendStatus(404);
     }
-    const [posts] = result.rows;
+    const postsResponse = [];
+    for (const post of result) {
+      const metadata = await urlMetadata(post.link);
+      postsResponse.push({
+        ...post,
+        linkTitle: metadata.title,
+        linkDescription: metadata.description,
+        linkImage: metadata.image,
+      })}
+        res.send(postsResponse);
+      } catch (error) {
+        console.log(error);
+        res.sendStatus(500);
+      }
+    }
 
-    res.send(posts);
-  } catch (error) {
-    console.log(error);
-    res.sendStatus(500);
-  }
-}
-
-export async function getTrendingHashtags(req, res) {
-  try {
-    const { rows: hashtags } = await hashtagsRepository.getTrendingHashtags();
-    res.send(hashtags);
-  } catch {
-    console.log(error);
-    res.sendStatus(500);
-  }
-}
+    export async function getTrendingHashtags(req, res) {
+      try {
+        const { rows: hashtags } = await hashtagsRepository.getTrendingHashtags();
+        res.send(hashtags);
+      } catch {
+        console.log(error);
+        res.sendStatus(500);
+      }
+    }
