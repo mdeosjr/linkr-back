@@ -184,7 +184,7 @@ export async function deletePost(req, res) {
     const post = result.rows[0].postHashtagId;
     await postsRepository.deletePostLikes(id);
     if (post !== null) {
-      await postsRepository.deletePostHashtags(post);
+      await postsRepository.deletePostHashtags(id);
     }
     await postsRepository.deletePost(id);
     return res.sendStatus(200);
@@ -204,13 +204,24 @@ export async function getPostByHashtag(req, res) {
     }
     const postsResponse = [];
     for (const post of result) {
-      const metadata = await urlMetadata(post.link);
+      const {rows: [metadata]} = await postsRepository.getMetadataByLink(post.link);
+      const likes = await postsRepository.getLikesPostById(post.id);
+      let liked = false;
+      if (res.locals.user.id) {
+        const userLike = await postsRepository.getLikesPostByUserId(post.id, res.locals.user.id);
+        if (userLike.rowCount > 0) {
+          liked = true;
+        }
+      }
       postsResponse.push({
         ...post,
-        linkTitle: metadata.title,
-        linkDescription: metadata.description,
-        linkImage: metadata.image,
-      })
+        linkTitle: metadata.linkTitle,
+        linkDescription: metadata.linkDescription,
+        linkImage: metadata.linkImage,
+        likes: likes.rowCount,
+        liked: liked,
+        usersLikes: likes.rows.map(like => like.name)
+      });
     }
     res.send(postsResponse);
   } catch (error) {
@@ -222,7 +233,7 @@ export async function getPostByHashtag(req, res) {
 export async function getTrendingHashtags(req, res) {
   try {
     const { rows: hashtags } = await hashtagsRepository.getTrendingHashtags();
-    res.send(hashtags);
+    return res.send(hashtags);
   } catch {
     console.log(error);
     res.sendStatus(500);

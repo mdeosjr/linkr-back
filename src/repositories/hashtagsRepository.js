@@ -66,6 +66,7 @@ async function getTrendingHashtags() {
     JOIN hashtags ON hashtags.id = "postsHashtags"."hashtagId"
     GROUP BY "hashtagId", hashtags."hashtagText"
     ORDER BY count DESC
+    LIMIT 10
       `
   );
 }

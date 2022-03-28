@@ -43,7 +43,7 @@ async function deletePostHashtags(id){
   return connection.query(`
   DELETE 
     FROM "postsHashtags"
-    WHERE id=$1
+    WHERE "postId"=$1
   `,[id]);
 }
 async function deletePostLikes(id){
@@ -72,8 +72,8 @@ async function updatePost(id, text) {
 async function getPostByHashtag(hashtag){
   
   return connection.query(`
-  SELECT hashtags.*,
-   posts.id AS "postId",posts.link,posts."textPost",posts."userId",posts.date,users.name AS "userName",
+  SELECT hashtags."hashtagText", hashtags.id AS "hashtagId",
+   posts.id AS "id",posts.link,posts."textPost",posts."userId",posts.date,users.name AS "userName",
    users.image AS "userImage"
     FROM hashtags
       JOIN "postsHashtags"

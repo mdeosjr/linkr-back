@@ -1,11 +1,12 @@
 import bcrypt from 'bcrypt';
 import urlMetadata from "url-metadata";
+import { postsRepository } from '../repositories/postsRepository.js';
 import { usersRepository } from '../repositories/usersRepository.js';
 
 export async function searchUsers(req, res) {
     const name = req.query.name;
     try {
-        const {rows: users} = await usersRepository.searchUsersByName(name);
+        const { rows: users } = await usersRepository.searchUsersByName(name);
         return res.send(users);
     } catch (error) {
         console.log(error);
@@ -42,18 +43,32 @@ export async function getUser(req, res) {
         const image = userArray.rows[0].image;
 
         const postsArray = [];
-        for(const data of userArray.rows) {
-            if (data.link === null) break;
+        for (const data of userArray.rows) {
+            if (data.link === null) {
+                return res.send([{name, image}])
+            }
             const metadata = await urlMetadata(data.link);
+            const likes = await postsRepository.getLikesPostById(data.id);
+            let liked = false;
+            if (res.locals.user.id) {
+                const userLike = await postsRepository.getLikesPostByUserId(data.id, res.locals.user.id);
+                if (userLike.rowCount > 0) {
+                    liked = true;
+                }
+            }
             postsArray.push({
                 name,
                 image,
                 link: data.link,
                 text: data.textPost,
+                id: data.id,
                 linkTitle: metadata.title,
                 linkDescription: metadata.description,
-                linkImage: metadata.image
-            }) 
+                linkImage: metadata.image,
+                likes: likes.rowCount,
+                liked: liked,
+                usersLikes: likes.rows.map(like => like.name)
+            })
         }
         res.status(200).send(postsArray)
     } catch (e) {
