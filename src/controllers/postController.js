@@ -110,12 +110,19 @@ export async function getTimelinePosts(req, res) {
 
 export async function deletePost(req, res) {
   const { id } = req.params;
+  console.log("id"+id)
   try {
     const result = await postsRepository.selectPost(id, res.locals.user.id);
     if (result.rowCount === 0) {
       return res.sendStatus(401);
     }
-    await postsRepository.deletePost(id);
+    const post=result.rows[0].postHashtagId;
+    console.log(post);
+    
+    if(post!== null){
+      await postsRepository.deletePostHashtags(post);
+    }
+    await postsRepository.deletePost(id);    
     res.sendStatus(200);
   } catch (error) {
     console.log(error);
