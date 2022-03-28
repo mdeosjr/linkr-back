@@ -25,3 +25,14 @@ export async function login(req, res) {
     }
 }
 
+export async function deleteSession(req, res) {
+    const {id} = req.params;
+    try {
+        await usersRepository.deleteSession(id);
+        res.sendStatus(200);
+
+    } catch (error) {
+        console.log(error);
+        res.sendStatus(500);
+    }
+}
