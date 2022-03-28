@@ -7,6 +7,9 @@ import {
   populatePostsHashtags,
   getPostByHashtag,
   getTrendingHashtags,
+  getLikesPost,
+  submitLike,
+  submitUnlike,
 } from "../controllers/postController.js";
 import postSchema from "../schemas/postSchema.js";
 import validateSchema from "../middlewares/validateSchemaMW.js";
@@ -32,5 +35,8 @@ postRouter.put(
 );
 postRouter.get("/hashtag/:hashtag", getPostByHashtag);
 postRouter.get("/trendingHashtags", validateToken, getTrendingHashtags);
+postRouter.get("/likes/:postId", validateToken, getLikesPost)
+postRouter.post("/likes/:postId", validateToken, submitLike)
+postRouter.delete("/likes/:postId", validateToken, submitUnlike)
 
 export default postRouter;

@@ -67,6 +67,45 @@ async function getPostByHashtag(hashtag){
   `,[hashtag]);
 }
 
+async function getLikesPostById(postId) {
+  return connection.query(`
+    SELECT likes."postId", likes."userId", users.name
+    FROM likes
+    JOIN users ON users.id = likes."userId"
+    WHERE likes."postId" = $1
+  `, [postId]);
+}
+
+async function getLikesPostByUserId(postId, userId) {
+  return connection.query(`
+    SELECT likes."postId", likes."userId", users.name
+    FROM likes
+    JOIN users ON users.id = likes."userId"
+    WHERE likes."postId" = $1 and likes."userId" = $2
+  `, [postId, userId]);
+}
+
+async function postLike(postId, userId) {
+  return connection.query(`
+    INSERT INTO likes ("postId", "userId")
+    VALUES ($1, $2)
+  `, [postId, userId]);
+}
+
+async function deleteLike(postId, userId) {
+  return connection.query(`
+    DELETE FROM likes
+    WHERE likes."postId" = $1 and likes."userId" = $2
+  `, [postId, userId]);
+}
+
+async function findLikeByUserId(userId, postId) {
+  return connection.query(`
+    SELECT * FROM likes
+    WHERE "userId" = $1 and "postId" = $2
+  `, [userId, postId]);
+}
+ 
 export const postsRepository = {
   create,
   getTimeline,
@@ -74,7 +113,12 @@ export const postsRepository = {
   deletePost,
   findPost,
   updatePost,
-  getPostByHashtag
+  getPostByHashtag,
+  getLikesPostById,
+  getLikesPostByUserId,
+  postLike,
+  deleteLike,
+  findLikeByUserId,
 };
 
 // SELECT * FROM posts ORDER BY date DESC LIMIT 20`
