@@ -55,13 +55,6 @@ export async function getUser(req, res) {
                 linkImage: metadata.image
             }) 
         }
-
-        // const userData = {
-        //     name,
-        //     image,
-        //     posts: postsArray
-        // }
-        console.log(postsArray)
         res.status(200).send(postsArray)
     } catch (e) {
         console.error(e);

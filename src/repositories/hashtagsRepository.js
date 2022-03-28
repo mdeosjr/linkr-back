@@ -45,7 +45,6 @@ async function getPostId({ link, text, userId }) {
 }
 
 async function createPostsHashtagsEntry(hashtagId, postId) {
-  console.log(hashtagId, postId);
   connection.query(
     `
           INSERT INTO "postsHashtags"

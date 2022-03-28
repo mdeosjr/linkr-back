@@ -46,6 +46,13 @@ async function deletePostHashtags(id){
     WHERE id=$1
   `,[id]);
 }
+async function deletePostLikes(id){
+  return connection.query(`
+  DELETE 
+    FROM likes
+    WHERE "postId"=$1
+  `,[id]);
+}
 
 async function findPost(id){
   return connection.query(`
@@ -117,6 +124,21 @@ async function findLikeByUserId(userId, postId) {
     WHERE "userId" = $1 and "postId" = $2
   `, [userId, postId]);
 }
+
+async function createMetadata(link, metadata) {
+  return connection.query(`
+    INSERT INTO "postsMetadata" 
+    (link, "linkTitle", "linkDescription", "linkImage")
+    VALUES ($1, $2, $3, $4)
+  `, [link, metadata.linkTitle, metadata.linkDescription, metadata.linkImage]);
+}
+
+async function getMetadataByLink(link) {
+  return connection.query(`
+    SELECT * FROM "postsMetadata"
+    WHERE link = $1
+  `, [link]);
+}
  
 export const postsRepository = {
   create,
@@ -132,6 +154,7 @@ export const postsRepository = {
   postLike,
   deleteLike,
   findLikeByUserId,
+  createMetadata,
+  getMetadataByLink,
+  deletePostLikes,
 };
-
-// SELECT * FROM posts ORDER BY date DESC LIMIT 20`
