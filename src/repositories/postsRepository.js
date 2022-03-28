@@ -79,13 +79,13 @@ async function getPostByHashtag(hashtag){
   `,[hashtag]);
 }
 
-async function getLikesPostById(postId) {
+async function getLikesPostById(postId,userId) {
   return connection.query(`
     SELECT likes."postId", likes."userId", users.name
     FROM likes
     JOIN users ON users.id = likes."userId"
     WHERE likes."postId" = $1
-  `, [postId]);
+    `, [postId]);
 }
 
 async function getLikesPostByUserId(postId, userId) {

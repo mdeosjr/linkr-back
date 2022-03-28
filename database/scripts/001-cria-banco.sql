@@ -36,3 +36,11 @@ CREATE TABLE "sessions"(
     "userId" INTEGER NOT NULL REFERENCES "users"("id"),
     "token" TEXT NOT NULL UNIQUE
 );
+
+CREATE TABLE "postsMetadata"(
+    id SERIAL NOT NULL PRIMARY KEY,
+    "link" TEXT NOT NULL,
+    "linkTitle" TEXT DEFAULT '',
+    "linkDescription" TEXT DEFAULT '',
+    "linkImage" TEXT DEFAULT 'https://svgur.com/i/fhk.svg'
+)

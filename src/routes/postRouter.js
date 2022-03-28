@@ -33,7 +33,7 @@ postRouter.put(
   validateSchema(updatePostSchema),
   updatePost
 );
-postRouter.get("/hashtag/:hashtag", getPostByHashtag);
+postRouter.get("/hashtag/:hashtag", validateToken,getPostByHashtag);
 postRouter.get("/trendingHashtags", validateToken, getTrendingHashtags);
 postRouter.get("/likes/:postId", validateToken, getLikesPost)
 postRouter.post("/likes/:postId", validateToken, submitLike)

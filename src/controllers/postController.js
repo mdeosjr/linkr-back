@@ -149,6 +149,7 @@ export async function getTimelinePosts(req, res) {
           liked = true;
         }
       }
+      
       const metadata = await urlMetadata(post.link);
       postsResponse.push({
         ...post,
@@ -157,7 +158,7 @@ export async function getTimelinePosts(req, res) {
         linkImage: metadata.image,
         likes: likes.rowCount,
         liked: liked,
-        usersLikes: likes.rows.map(like => like.name)
+        usersLikes: likes.rows.map(like => like.name)         
       });
     }
     res.send(postsResponse);
