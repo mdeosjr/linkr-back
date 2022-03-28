@@ -24,10 +24,12 @@ async function getTimeline() {
 
 async function selectPost(id, userId){
     return connection.query(`
-    SELECT * 
+    SELECT posts.*,"postsHashtags"."postId", "postsHashtags"."id" AS "postHashtagId"
         FROM posts
-        WHERE id=$1
-        AND "userId"=$2
+          LEFT JOIN "postsHashtags"
+           ON posts.id="postsHashtags"."postId"
+        WHERE posts.id=$1
+        AND posts."userId"=$2
     `,[id,userId]);
 }
 async function deletePost(id){
@@ -36,6 +38,13 @@ async function deletePost(id){
         FROM posts
         WHERE id=$1
     `,[id]);
+}
+async function deletePostHashtags(id){
+  return connection.query(`
+  DELETE 
+    FROM "postsHashtags"
+    WHERE id=$1
+  `,[id]);
 }
 
 async function findPost(id){
@@ -117,6 +126,7 @@ export const postsRepository = {
   findPost,
   updatePost,
   getPostByHashtag,
+  deletePostHashtags,
   getLikesPostById,
   getLikesPostByUserId,
   postLike,
