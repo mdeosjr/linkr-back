@@ -37,6 +37,7 @@ CREATE TABLE "sessions"(
     "token" TEXT NOT NULL UNIQUE
 );
 
+<<<<<<< HEAD
 CREATE TABLE "postsMetadata"(
     id SERIAL NOT NULL PRIMARY KEY,
     "link" TEXT NOT NULL,
@@ -44,3 +45,12 @@ CREATE TABLE "postsMetadata"(
     "linkDescription" TEXT DEFAULT '',
     "linkImage" TEXT DEFAULT 'https://svgur.com/i/fhk.svg'
 )
+=======
+CREATE TABLE "postsMetadata" (
+	id SERIAL NOT NULL PRIMARY KEY,
+	"link" TEXT NOT NULL,
+	"linkTitle" TEXT DEFAULT '',
+	"linkDescription" TEXT DEFAULT '',
+	"linkImage" TEXT DEFAULT 'https://svgur.com/i/fhk.svg'
+)
+>>>>>>> master

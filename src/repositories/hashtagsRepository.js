@@ -45,7 +45,6 @@ async function getPostId({ link, text, userId }) {
 }
 
 async function createPostsHashtagsEntry(hashtagId, postId) {
-  console.log(hashtagId, postId);
   connection.query(
     `
           INSERT INTO "postsHashtags"
@@ -67,6 +66,7 @@ async function getTrendingHashtags() {
     JOIN hashtags ON hashtags.id = "postsHashtags"."hashtagId"
     GROUP BY "hashtagId", hashtags."hashtagText"
     ORDER BY count DESC
+    LIMIT 10
       `
   );
 }
