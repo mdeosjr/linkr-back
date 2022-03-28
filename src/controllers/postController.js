@@ -7,7 +7,7 @@ export async function getLikesPost(req, res) {
   try {
     const likes = await postsRepository.getLikesPostById(postId);
 
-    
+
     res.send({ likes: likes.rowCount, userLike: liked });
 
   } catch (error) {
@@ -17,11 +17,11 @@ export async function getLikesPost(req, res) {
 }
 
 export async function submitLike(req, res) {
-  const {postId} = req.params;
+  const { postId } = req.params;
   const userId = res.locals.user.id;
   try {
     const liked = await postsRepository.findLikeByUserId(userId, postId);
-    if(liked.rowCount === 0) {
+    if (liked.rowCount === 0) {
       await postsRepository.postLike(postId, userId);
       return res.sendStatus(200)
     }
@@ -34,11 +34,11 @@ export async function submitLike(req, res) {
   }
 }
 export async function submitUnlike(req, res) {
-  const {postId} = req.params;
+  const { postId } = req.params;
   const userId = res.locals.user.id;
   try {
     const liked = await postsRepository.findLikeByUserId(userId, postId);
-    if(liked.rowCount > 0) {
+    if (liked.rowCount > 0) {
       await postsRepository.deleteLike(postId, userId);
       return res.sendStatus(200)
     }
@@ -79,13 +79,20 @@ export async function submitPost(req, res, next) {
   const hashtags = text.match(/#\w+/g);
 
   try {
+    const metadata = await urlMetadata(link);
+    const metaDataUrl = {
+      linkTitle: metadata.title,
+      linkDescription: metadata.description,
+      linkImage: metadata.image,
+    };
     const post = {
       link,
       text,
-      userId,
+      userId
     };
     await postsRepository.create(post);
-    console.log(hashtags);
+    await postsRepository.createMetadata(link, metaDataUrl);
+    
     if (hashtags !== null) {
       for (const value of hashtags) {
         const hashtag = value.substring(1).toLowerCase();
@@ -141,6 +148,7 @@ export async function getTimelinePosts(req, res) {
 
     const postsResponse = [];
     for (const post of posts) {
+      const {rows: [metadata]} = await postsRepository.getMetadataByLink(post.link);
       const likes = await postsRepository.getLikesPostById(post.id);
       let liked = false;
       if (res.locals.user.id) {
@@ -149,12 +157,11 @@ export async function getTimelinePosts(req, res) {
           liked = true;
         }
       }
-      const metadata = await urlMetadata(post.link);
       postsResponse.push({
         ...post,
-        linkTitle: metadata.title,
-        linkDescription: metadata.description,
-        linkImage: metadata.image,
+        linkTitle: metadata.linkTitle,
+        linkDescription: metadata.linkDescription,
+        linkImage: metadata.linkImage,
         likes: likes.rowCount,
         liked: liked,
         usersLikes: likes.rows.map(like => like.name)
@@ -169,20 +176,18 @@ export async function getTimelinePosts(req, res) {
 
 export async function deletePost(req, res) {
   const { id } = req.params;
-  console.log("id"+id)
   try {
     const result = await postsRepository.selectPost(id, res.locals.user.id);
     if (result.rowCount === 0) {
       return res.sendStatus(401);
     }
-    const post=result.rows[0].postHashtagId;
-    console.log(post);
-    
-    if(post!== null){
+    const post = result.rows[0].postHashtagId;
+    await postsRepository.deletePostLikes(id);
+    if (post !== null) {
       await postsRepository.deletePostHashtags(post);
     }
-    await postsRepository.deletePost(id);    
-    res.sendStatus(200);
+    await postsRepository.deletePost(id);
+    return res.sendStatus(200);
   } catch (error) {
     console.log(error);
     res.sendStatus(500);
@@ -193,7 +198,7 @@ export async function getPostByHashtag(req, res) {
   const { hashtag } = req.params;
 
   try {
-    const {rows:result} = await postsRepository.getPostByHashtag(hashtag);
+    const { rows: result } = await postsRepository.getPostByHashtag(hashtag);
     if (result.rowCount === 0) {
       return res.sendStatus(404);
     }
@@ -205,20 +210,21 @@ export async function getPostByHashtag(req, res) {
         linkTitle: metadata.title,
         linkDescription: metadata.description,
         linkImage: metadata.image,
-      })}
-        res.send(postsResponse);
-      } catch (error) {
-        console.log(error);
-        res.sendStatus(500);
-      }
+      })
     }
+    res.send(postsResponse);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+  }
+}
 
-    export async function getTrendingHashtags(req, res) {
-      try {
-        const { rows: hashtags } = await hashtagsRepository.getTrendingHashtags();
-        res.send(hashtags);
-      } catch {
-        console.log(error);
-        res.sendStatus(500);
-      }
-    }
+export async function getTrendingHashtags(req, res) {
+  try {
+    const { rows: hashtags } = await hashtagsRepository.getTrendingHashtags();
+    res.send(hashtags);
+  } catch {
+    console.log(error);
+    res.sendStatus(500);
+  }
+}
