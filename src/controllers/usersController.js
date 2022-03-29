@@ -1,6 +1,5 @@
 import bcrypt from 'bcrypt';
-import urlMetadata from "url-metadata";
-import { postsRepository } from '../repositories/postsRepository.js';
+import { postsRepository } from "../repositories/postsRepository.js";
 import { usersRepository } from '../repositories/usersRepository.js';
 
 export async function searchUsers(req, res) {
@@ -44,14 +43,11 @@ export async function getUser(req, res) {
 
         const postsArray = [];
         for (const data of userArray.rows) {
-            if (data.link === null) {
-                return res.send([{name, image}])
-            }
-            const metadata = await urlMetadata(data.link);
-            const likes = await postsRepository.getLikesPostById(data.id);
+            const {rows: [metadata]} = await postsRepository.getMetadataByLink(data.link);
+            const likes = await postsRepository.getLikesPostById(data.postId);
             let liked = false;
             if (res.locals.user.id) {
-                const userLike = await postsRepository.getLikesPostByUserId(data.id, res.locals.user.id);
+                const userLike = await postsRepository.getLikesPostByUserId(data.postId, res.locals.user.id);
                 if (userLike.rowCount > 0) {
                     liked = true;
                 }
@@ -61,10 +57,11 @@ export async function getUser(req, res) {
                 image,
                 link: data.link,
                 text: data.textPost,
-                id: data.id,
-                linkTitle: metadata.title,
-                linkDescription: metadata.description,
-                linkImage: metadata.image,
+                postId: data.postId,
+                userId: data.userId,
+                linkTitle: metadata.linkTitle,
+                linkDescription: metadata.linkDescription,
+                linkImage: metadata.linkImage,
                 likes: likes.rowCount,
                 liked: liked,
                 usersLikes: likes.rows.map(like => like.name)

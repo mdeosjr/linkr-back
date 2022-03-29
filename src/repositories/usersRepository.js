@@ -32,9 +32,13 @@ async function findUser(userId) {
 
 async function getUserData(userId) {
     return connection.query(`
-        SELECT u.name, u.image, p.id, p."userId", p.link, p."textPost" FROM users u
-            LEFT JOIN posts p ON p."userId"=u.id
-            WHERE u.id=$1
+        SELECT 
+            u.name, u.image, u.id AS "userId",
+            p.id AS "postId", p."userId", p.link, p."textPost"
+        FROM users u
+        LEFT JOIN posts p ON p."userId"=u.id
+        WHERE u.id=$1
+        ORDER BY "postId" DESC
     `, [userId])
 }
 
