@@ -45,6 +45,13 @@ async function searchUsersByName(name) {
     `)
 }
 
+async function deleteSession(id){
+    return connection.query(`
+        DELETE FROM sessions
+        WHERE "userId" = $1
+    `, [id]);
+}
+
 export const usersRepository = {
     find,
     create,
@@ -52,5 +59,6 @@ export const usersRepository = {
     findSession,
     findUser,
     getUserData,
-    searchUsersByName
+    searchUsersByName,
+    deleteSession
 }
