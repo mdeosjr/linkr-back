@@ -157,6 +157,24 @@ export async function getTimelinePosts(req, res) {
           liked = true;
         }
       }
+      let cont = 0;
+
+      const newLikes = likes.rows.map(like => {
+        if(like.name === res.locals.user.name && cont === 0){
+          cont++;
+          return "Você"
+        } else {
+          return like.name
+        }
+      });
+
+      const indexOfUser = newLikes.indexOf("Você");
+      if(indexOfUser > 0) {
+        const aux = newLikes[0];
+        newLikes[0] = "Você";
+        newLikes[indexOfUser] = aux;
+      }
+
       postsResponse.push({
         ...post,
         linkTitle: metadata.linkTitle,
@@ -164,7 +182,7 @@ export async function getTimelinePosts(req, res) {
         linkImage: metadata.linkImage,
         likes: likes.rowCount,
         liked: liked,
-        usersLikes: likes.rows.map(like => like.name)
+        usersLikes: newLikes
       });
     }
     res.send(postsResponse);
