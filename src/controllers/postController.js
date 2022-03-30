@@ -31,6 +31,7 @@ export async function submitLike(req, res) {
     res.sendStatus(500);
   }
 }
+
 export async function submitUnlike(req, res) {
   const { postId } = req.params;
   const userId = res.locals.user.id;
@@ -269,6 +270,18 @@ export async function getTrendingHashtags(req, res) {
     return res.send(hashtags);
   } catch {
     console.log(error);
+    res.sendStatus(500);
+  }
+}
+
+export async function getFollowingPosts(req, res) {
+  const { id } = req.params;
+
+  try {
+    const { rows: result } = await postsRepository.getFollowingPosts(id);
+    res.status(200).send(result);
+  } catch (e) {
+    console.log(e);
     res.sendStatus(500);
   }
 }
