@@ -1,15 +1,14 @@
 import { postsRepository } from "../repositories/postsRepository.js";
 import { hashtagsRepository } from "../repositories/hashtagsRepository.js";
 import urlMetadata from "url-metadata";
+import { commentsRepository } from "../repositories/commentsRepository.js";
 
 export async function getLikesPost(req, res) {
   const postId = req.params.postId;
   try {
     const likes = await postsRepository.getLikesPostById(postId);
 
-
     res.send({ likes: likes.rowCount, userLike: liked });
-
   } catch (error) {
     console.log(error);
     res.sendStatus(500);
@@ -23,11 +22,10 @@ export async function submitLike(req, res) {
     const liked = await postsRepository.findLikeByUserId(userId, postId);
     if (liked.rowCount === 0) {
       await postsRepository.postLike(postId, userId);
-      return res.sendStatus(200)
+      return res.sendStatus(200);
     }
 
-    return res.sendStatus(409)
-
+    return res.sendStatus(409);
   } catch (error) {
     console.log(error);
     res.sendStatus(500);
@@ -40,10 +38,9 @@ export async function submitUnlike(req, res) {
     const liked = await postsRepository.findLikeByUserId(userId, postId);
     if (liked.rowCount > 0) {
       await postsRepository.deleteLike(postId, userId);
-      return res.sendStatus(200)
+      return res.sendStatus(200);
     }
     return res.sendStatus(409);
-
   } catch (error) {
     console.log(error);
     res.sendStatus(500);
@@ -88,11 +85,11 @@ export async function submitPost(req, res, next) {
     const post = {
       link,
       text,
-      userId
+      userId,
     };
     await postsRepository.create(post);
     await postsRepository.createMetadata(link, metaDataUrl);
-    
+
     if (hashtags !== null) {
       for (const value of hashtags) {
         const hashtag = value.substring(1).toLowerCase();
@@ -145,31 +142,38 @@ export async function getTimelinePosts(req, res) {
   try {
     const { rows: posts } = await postsRepository.getTimeline();
 
-
     const postsResponse = [];
     for (const post of posts) {
-      const {rows: [metadata]} = await postsRepository.getMetadataByLink(post.link);
+      const {
+        rows: [metadata],
+      } = await postsRepository.getMetadataByLink(post.link);
       const likes = await postsRepository.getLikesPostById(post.id);
+      const { rows: comments } =
+        await commentsRepository.getNumberOfCommentsByPostId(post.id);
+
       let liked = false;
       if (res.locals.user.id) {
-        const userLike = await postsRepository.getLikesPostByUserId(post.id, res.locals.user.id);
+        const userLike = await postsRepository.getLikesPostByUserId(
+          post.id,
+          res.locals.user.id
+        );
         if (userLike.rowCount > 0) {
           liked = true;
         }
       }
       let cont = 0;
 
-      const newLikes = likes.rows.map(like => {
-        if(like.name === res.locals.user.name && cont === 0){
+      const newLikes = likes.rows.map((like) => {
+        if (like.name === res.locals.user.name && cont === 0) {
           cont++;
-          return "Você"
+          return "Você";
         } else {
-          return like.name
+          return like.name;
         }
       });
 
       const indexOfUser = newLikes.indexOf("Você");
-      if(indexOfUser > 0) {
+      if (indexOfUser > 0) {
         const aux = newLikes[0];
         newLikes[0] = "Você";
         newLikes[indexOfUser] = aux;
@@ -182,7 +186,8 @@ export async function getTimelinePosts(req, res) {
         linkImage: metadata.linkImage,
         likes: likes.rowCount,
         liked: liked,
-        usersLikes: newLikes
+        comments: comments[0].numberOfComments,
+        usersLikes: newLikes,
       });
     }
     res.send(postsResponse);
@@ -222,11 +227,19 @@ export async function getPostByHashtag(req, res) {
     }
     const postsResponse = [];
     for (const post of result) {
-      const {rows: [metadata]} = await postsRepository.getMetadataByLink(post.link);
+      const {
+        rows: [metadata],
+      } = await postsRepository.getMetadataByLink(post.link);
+      const { rows: comments } =
+        await commentsRepository.getNumberOfCommentsByPostId(post.id);
+
       const likes = await postsRepository.getLikesPostById(post.id);
       let liked = false;
       if (res.locals.user.id) {
-        const userLike = await postsRepository.getLikesPostByUserId(post.id, res.locals.user.id);
+        const userLike = await postsRepository.getLikesPostByUserId(
+          post.id,
+          res.locals.user.id
+        );
         if (userLike.rowCount > 0) {
           liked = true;
         }
@@ -238,7 +251,8 @@ export async function getPostByHashtag(req, res) {
         linkImage: metadata.linkImage,
         likes: likes.rowCount,
         liked: liked,
-        usersLikes: likes.rows.map(like => like.name)
+        comments: comments[0].numberOfComments,
+        usersLikes: likes.rows.map((like) => like.name),
       });
     }
     res.send(postsResponse);

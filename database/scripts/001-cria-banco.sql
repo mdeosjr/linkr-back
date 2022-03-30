@@ -37,10 +37,27 @@ CREATE TABLE "sessions"(
     "token" TEXT NOT NULL UNIQUE
 );
 
-CREATE TABLE "postsMetadata" (
-	id SERIAL NOT NULL PRIMARY KEY,
-	"link" TEXT NOT NULL,
-	"linkTitle" TEXT DEFAULT '',
-	"linkDescription" TEXT DEFAULT '',
-	"linkImage" TEXT DEFAULT 'https://svgur.com/i/fhk.svg'
-)
+CREATE TABLE "postsMetadata"(
+    "id" SERIAL NOT NULL PRIMARY KEY,
+    "link" TEXT NOT NULL,
+    "linkTitle" TEXT DEFAULT '',
+    "linkDescription" TEXT DEFAULT '',
+    "linkImage" TEXT DEFAULT 'https://svgur.com/i/fhk.svg'
+);
+CREATE TABLE "follows"(
+    "id" SERIAL NOT NULL PRIMARY KEY,
+    "userId" INTEGER NOT NULL REFERENCES "users"("id"),
+    "followingId" INTEGER NOT NULL REFERENCES "users"("id")
+);
+CREATE TABLE "reposts"(
+    "id" SERIAL NOT NULL PRIMARY KEY,
+    "postId" INTEGER NOT NULL REFERENCES "posts"("id"),
+    "reposterId" INTEGER NOT NULL REFERENCES "users"("id")
+);
+CREATE TABLE "comments"(
+    "id" SERIAL NOT NULL PRIMARY KEY,
+    "textComment" TEXT NOT NULL,
+    "userId" INTEGER NOT NULL REFERENCES "users"("id"),
+    "postId" INTEGER NOT NULL REFERENCES "posts"("id")
+);
+
