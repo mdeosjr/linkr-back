@@ -142,8 +142,9 @@ export async function populatePostsHashtags(req, res) {
 }
 
 export async function getTimelinePosts(req, res) {
+  const userId=res.locals.user.id;
   try {
-    const { rows: posts } = await postsRepository.getTimeline();
+    const { rows: posts } = await postsRepository.getTimeline(userId);
 
 
     const postsResponse = [];

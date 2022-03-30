@@ -119,7 +119,7 @@ export async function getFollows(req,res){
     try {
         const result = await usersRepository.getFollows(userId,followingId)
         if(result.rowCount===0){
-            return res.send(follow);
+            return res.send({follow});
         }
         follow=true;
         res.status(200).send({
