@@ -32,9 +32,13 @@ async function findUser(userId) {
 
 async function getUserData(userId) {
     return connection.query(`
-        SELECT u.name, u.image, p.id, p."userId", p.link, p."textPost" FROM users u
-            LEFT JOIN posts p ON p."userId"=u.id
-            WHERE u.id=$1
+        SELECT 
+            u.name, u.image, u.id AS "userId",
+            p.id AS "postId", p."userId", p.link, p."textPost"
+        FROM users u
+        LEFT JOIN posts p ON p."userId"=u.id
+        WHERE u.id=$1
+        ORDER BY "postId" DESC
     `, [userId])
 }
 
@@ -68,6 +72,38 @@ async function searchFollowedUser(userId, name) {
         order by u.name
     `, [userId]);
 }
+async function followUser(id, followingId){
+    return connection.query(`
+    SELECT users.*,follows."userId",follows."followingId"
+        FROM users
+            JOIN follows
+                ON users.id=follows."userId"
+    WHERE users.id=$1
+        AND follows."followingId"=$2;
+        `,[id,followingId]);
+}
+async function insertFollow(userId,followingId){
+    return connection.query(`
+    INSERT INTO follows ("userId","followingId") 
+    VALUES ($1,$2)
+    `,[userId,followingId]);
+}
+async function deleteFollow(userId,followingId){
+    return connection.query(`
+    DELETE FROM follows
+        WHERE follows."userId"=$1
+            AND follows."followingId"=$2
+    `,[userId,followingId]);
+
+}
+async function getFollows(userId,followingId){
+    return connection.query(`
+    SELECT * 
+        FROM follows
+            WHERE follows."userId"=$1
+                AND follows."followingId"=$2
+    `,[userId,followingId]);
+}
 
 export const usersRepository = {
     find,
@@ -78,5 +114,9 @@ export const usersRepository = {
     getUserData,
     searchUsersByName,
     deleteSession,
-    searchFollowedUser
+    searchFollowedUser,
+    followUser,
+    insertFollow,
+    deleteFollow,
+    getFollows
 }
