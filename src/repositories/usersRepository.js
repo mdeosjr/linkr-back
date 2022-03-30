@@ -56,6 +56,39 @@ async function deleteSession(id){
     `, [id]);
 }
 
+async function followUser(id, followingId){
+    return connection.query(`
+    SELECT users.*,follows."userId",follows."followingId"
+        FROM users
+            JOIN follows
+                ON users.id=follows."userId"
+    WHERE users.id=$1
+        AND follows."followingId"=$2;
+        `,[id,followingId]);
+}
+async function insertFollow(userId,followingId){
+    return connection.query(`
+    INSERT INTO follows ("userId","followingId") 
+    VALUES ($1,$2)
+    `,[userId,followingId]);
+}
+async function deleteFollow(userId,followingId){
+    return connection.query(`
+    DELETE FROM follows
+        WHERE follows."userId"=$1
+            AND follows."followingId"=$2
+    `,[userId,followingId]);
+
+}
+async function getFollows(userId,followingId){
+    return connection.query(`
+    SELECT * 
+        FROM follows
+            WHERE follows."userId"=$1
+                AND follows."followingId"=$2
+    `,[userId,followingId]);
+}
+
 export const usersRepository = {
     find,
     create,
@@ -64,5 +97,9 @@ export const usersRepository = {
     findUser,
     getUserData,
     searchUsersByName,
-    deleteSession
+    deleteSession,
+    followUser,
+    insertFollow,
+    deleteFollow,
+    getFollows
 }

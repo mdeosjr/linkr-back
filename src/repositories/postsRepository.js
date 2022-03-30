@@ -13,7 +13,11 @@ async function create(post) {
 
 async function getTimeline(id) {
   return connection.query(`
+<<<<<<< HEAD
    SELECT 
+=======
+  SELECT 
+>>>>>>> master
       p.*,
       users.name AS "userName",
       users.image AS "userImage"
@@ -22,8 +26,21 @@ async function getTimeline(id) {
     LEFT JOIN follows f ON f."followingId"=p."userId"
    	WHERE f."userId"=$1 OR p."userId"=$1
     ORDER BY date DESC
+<<<<<<< HEAD
     `, [id]);
+=======
+  `,[id]);
+>>>>>>> master
 }
+//   return connection.query(`
+//    SELECT 
+//       posts.*,
+//       users.name AS "userName",
+//       users.image AS "userImage"
+//    FROM posts
+//    JOIN users ON users.id = posts."userId"
+//     ORDER BY date DESC LIMIT 20`);
+// }
 
 async function selectPost(id, userId){
     return connection.query(`
@@ -91,13 +108,13 @@ async function getPostByHashtag(hashtag){
   `,[hashtag]);
 }
 
-async function getLikesPostById(postId) {
+async function getLikesPostById(postId,userId) {
   return connection.query(`
     SELECT likes."postId", likes."userId", users.name
     FROM likes
     JOIN users ON users.id = likes."userId"
     WHERE likes."postId" = $1
-  `, [postId]);
+    `, [postId]);
 }
 
 async function getLikesPostByUserId(postId, userId) {
