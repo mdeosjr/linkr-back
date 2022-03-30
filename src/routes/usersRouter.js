@@ -8,6 +8,6 @@ const usersRouter = Router();
 
 usersRouter.post('/users', validateSchema(userSchema), createUser);
 usersRouter.get('/user/:id', validateToken, getUser);
-usersRouter.get('/users/search', searchUsers)
+usersRouter.get('/users/search', validateToken, searchUsers);
 
 export default usersRouter;

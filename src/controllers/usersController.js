@@ -5,9 +5,34 @@ import { usersRepository } from '../repositories/usersRepository.js';
 
 export async function searchUsers(req, res) {
     const name = req.query.name;
+    const id = res.locals.user.id;
     try {
+        const { rows: following } = await usersRepository.searchFollowedUser(id, name);
+        const usersFollowed = [];
+        following.map(user => {
+            usersFollowed.push({
+                ...user,
+                follow: 'following'
+            })
+        });
         const { rows: users } = await usersRepository.searchUsersByName(name);
-        return res.send(users);
+        const allUsers = [...usersFollowed];
+        users.map(user => {
+            let follow = '';
+            if(user.id === id) {
+                follow = 'you';
+            }
+            if(following.filter(e => e.followingId === user.id).length > 0) {
+                follow = 'following';
+            }
+            allUsers.push({
+                id: user.id,
+                name: user.name,
+                image: user.image,
+                follow: follow
+            });
+        })
+        return res.send(allUsers);
     } catch (error) {
         console.log(error);
         res.sendStatus(500);

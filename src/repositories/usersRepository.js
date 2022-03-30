@@ -40,16 +40,33 @@ async function getUserData(userId) {
 
 async function searchUsersByName(name) {
     return connection.query(`
-        SELECT users.id, users.name, users.image FROM users
-        WHERE LOWER(name) LIKE LOWER('%${name}%')
+    SELECT users.id, users.name, users.image FROM users
+    WHERE LOWER(name) LIKE LOWER('%${name}%') and id not in (
+            SELECT u.id FROM users
+            JOIN follows f ON f."userId" = users.id
+            JOIN users u ON u.id = f."followingId"
+            WHERE users.id = 1
+            ORDER BY u.name
+        )
+    ORDER BY users.name
     `)
 }
 
-async function deleteSession(id){
+async function deleteSession(id) {
     return connection.query(`
         DELETE FROM sessions
         WHERE "userId" = $1
     `, [id]);
+}
+
+async function searchFollowedUser(userId, name) {
+    return connection.query(`
+        select u.id, u.name, u.image from users
+        join follows f on f."userId" = users.id
+        join users u on u.id = f."followingId"
+        where users.id = $1 and LOWER(u.name) LIKE LOWER('%${name}%')
+        order by u.name
+    `, [userId]);
 }
 
 export const usersRepository = {
@@ -60,5 +77,6 @@ export const usersRepository = {
     findUser,
     getUserData,
     searchUsersByName,
-    deleteSession
+    deleteSession,
+    searchFollowedUser
 }
