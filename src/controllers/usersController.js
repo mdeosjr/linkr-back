@@ -73,3 +73,60 @@ export async function getUser(req, res) {
         res.sendStatus(500);
     }
 }
+
+export async function followUsers(req,res){
+    const{followingId}=req.params;
+    const userId = res.locals.user.id;
+    
+    try {
+       const result= await usersRepository.followUser(userId,followingId);
+       if(result.rowCount>0){
+        return res.sendStatus(409);
+       }
+
+       await usersRepository.insertFollow(userId,followingId);
+       res.sendStatus(200);    
+        
+    } catch (error) {
+        console.log(error);
+        res.sendStatus(500);        
+    }
+
+}
+
+export async function unfollowUser(req,res){
+    const{followingId}=req.params;
+    const userId=res.locals.user.id;
+    
+    try {
+        const result= await usersRepository.followUser(userId,followingId);
+        console.log(result.rows);
+        if(result.rowCount===0){
+            return res.sendStatus(409);
+        }
+        await usersRepository.deleteFollow(userId,followingId);
+        res.sendStatus(200);
+        
+    } catch (error) {
+        console.log(error);
+        res.sendStatus(500);
+    }
+}
+export async function getFollows(req,res){
+    const {followingId}=req.params;
+    const userId=res.locals.user.id;
+    let follow=false;
+    try {
+        const result = await usersRepository.getFollows(userId,followingId)
+        if(result.rowCount===0){
+            return res.send(follow);
+        }
+        follow=true;
+        res.status(200).send({
+            ...result.rows[0],
+               follow});
+    } catch (error) {
+        console.log(error);
+        res.sendStatus(500);
+    }
+}
