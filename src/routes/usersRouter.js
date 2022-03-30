@@ -8,7 +8,7 @@ const usersRouter = Router();
 
 usersRouter.post('/users', validateSchema(userSchema), createUser);
 usersRouter.get('/user/:id', validateToken, getUser);
-usersRouter.get('/users/search', searchUsers)
+usersRouter.get('/users/search', validateToken, searchUsers);
 usersRouter.post('/follows/:followingId',validateToken,followUsers);
 usersRouter.delete('/follows/:followingId',validateToken,unfollowUser);
 usersRouter.get('/follows/:followingId',validateToken,getFollows);
