@@ -137,8 +137,10 @@ export async function populatePostsHashtags(req, res) {
 
 export async function getTimelinePosts(req, res) {
   const userId = res.locals.user.id;
+  const { offset } = req.query;
+
   try {
-    const { rows: posts } = await postsRepository.getTimeline(userId);
+    const { rows: posts } = await postsRepository.getTimeline(userId, offset);
 
     const postsResponse = [];
     for (const post of posts) {
