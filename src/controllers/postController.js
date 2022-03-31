@@ -131,15 +131,15 @@ export async function populatePostsHashtags(req, res) {
       );
 
       await hashtagsRepository.createPostsHashtagsEntry(
-        hashtagId[0].id,
-        postId[0].id
+        hashtagId[0]?.id,
+        postId[0]?.id
       );
     }
   }
 }
 
 export async function getTimelinePosts(req, res) {
-  const userId=res.locals.user.id;
+  const userId = res.locals.user.id;
   try {
     const { rows: posts } = await postsRepository.getTimeline(userId);
 
