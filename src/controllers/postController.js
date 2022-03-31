@@ -285,3 +285,16 @@ export async function getFollowingPosts(req, res) {
     res.sendStatus(500);
   }
 }
+
+export async function countFollows(req,res){
+  const userId=res.locals.user.id;
+  try {
+    const result= await postsRepository.countFollows(userId);
+    res.status(200).send(result.rows[0]);
+    
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+    
+  }
+}

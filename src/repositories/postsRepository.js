@@ -13,18 +13,27 @@ async function create(post) {
 
 async function getTimeline(id, offset) {
   return connection.query(`
-   SELECT 
-      p.*,
-      users.name AS "userName",
-      users.image AS "userImage"
-    FROM posts p
-    LEFT JOIN users ON users.id=p."userId"
-    LEFT JOIN follows f ON f."followingId"=p."userId"
-   	WHERE f."userId"=$1 OR p."userId"=$1
-    ORDER BY date DESC
-    LIMIT 10
+  select p.* ,
+  f."followingId",
+  u.name as "userName", u.image as "userImage",  
+  Null as "reposterId"
+  from posts p
+  join follows f on f."userId" = $1
+  join users u on u.id = p."userId"
+  where p."userId" = f."followingId"
+  UNION ALL
+  select 
+  p.*, 
+  follows."followingId",
+  u.name, u.image, r."reposterId"
+  from follows 
+  join reposts r on r."reposterId" = follows."followingId"
+  join posts p on p.id = r."postId"
+  join users u on u.id = r."reposterId"
+  WHERE follows."userId" = $1
+  LIMIT 10
     OFFSET $2
-    `, [id, offset]);
+    `,[id,offset]);
 }
 
 async function selectPost(id, userId) {
@@ -190,6 +199,14 @@ async function getMetadataByLink(link) {
   );
 }
 
+async function countFollows(userId){
+  return await connection.query(`
+  SELECT COUNT("followingId") AS following 
+    FROM follows
+      WHERE "userId"=$1
+  `,[userId]);
+}
+
 export const postsRepository = {
   create,
   getTimeline,
@@ -207,4 +224,5 @@ export const postsRepository = {
   createMetadata,
   getMetadataByLink,
   deletePostLikes,
+  countFollows
 };
