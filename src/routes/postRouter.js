@@ -10,6 +10,7 @@ import {
   getLikesPost,
   submitLike,
   submitUnlike,
+  countFollows,
 } from "../controllers/postController.js";
 import postSchema from "../schemas/postSchema.js";
 import validateSchema from "../middlewares/validateSchemaMW.js";
@@ -30,7 +31,7 @@ postRouter.post(
   submitPost,
   populatePostsHashtags
 );
-postRouter.get("/timeline/:id", validateToken, getTimelinePosts);
+postRouter.get("/timeline", validateToken, getTimelinePosts);
 postRouter.delete("/post/:id", validateToken, deletePost);
 postRouter.put(
   "/post/:id",
@@ -45,5 +46,6 @@ postRouter.post("/likes/:postId", validateToken, submitLike);
 postRouter.delete("/likes/:postId", validateToken, submitUnlike);
 postRouter.post("/comments/create", validateToken, createComment);
 postRouter.get("/comments/:postId", validateToken, getPostComments);
+postRouter.get("/countfollows",validateToken,countFollows);
 
 export default postRouter;

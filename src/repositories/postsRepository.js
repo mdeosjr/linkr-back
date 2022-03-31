@@ -11,56 +11,76 @@ async function create(post) {
   );
 }
 
-async function getTimeline(id) {
+async function getTimeline(userId) {
   return connection.query(`
+  select p.* ,
+  f."followingId",
+  u.name as "userName", u.image as "userImage",  
+  Null as "reposterId"
+  from posts p
+  join follows f on f."userId" = $1
+  join users u on u.id = p."userId"
+  where p."userId" = f."followingId"
+  UNION ALL
+  select 
+  p.*, 
+  follows."followingId",
+  u.name, u.image, r."reposterId"
+  from follows 
+  join reposts r on r."reposterId" = follows."followingId"
+  join posts p on p.id = r."postId"
+  join users u on u.id = r."reposterId"
+  WHERE follows."userId" = $1
+  `,[userId]);
+  /*return connection.query(`
    SELECT 
       p.*,
       users.name AS "userName",
       users.image AS "userImage"
-    FROM posts p
+       FROM posts p
     LEFT JOIN users ON users.id=p."userId"
     LEFT JOIN follows f ON f."followingId"=p."userId"
-   	WHERE f."userId"=$1 OR p."userId"=$1
+    WHERE f."userId"=$1
     ORDER BY date DESC
-    `, [id]);
+    `, [userId]);*/
 }
 
-async function selectPost(id, userId){
-    return connection.query(`
+async function selectPost(id, userId) {
+  return connection.query(`
     SELECT posts.*,"postsHashtags"."postId", "postsHashtags"."id" AS "postHashtagId"
         FROM posts
           LEFT JOIN "postsHashtags"
            ON posts.id="postsHashtags"."postId"
         WHERE posts.id=$1
         AND posts."userId"=$2
-    `,[id,userId]);
+    `, [id, userId]);
 }
 
-async function deletePost(id){
-    return connection.query(`
+async function deletePost(id) {
+  return connection.query(`
     DELETE 
         FROM posts
         WHERE id=$1
-    `,[id]);
+    `, [id]);
 }
 
-async function deletePostHashtags(id){
+async function deletePostHashtags(id) {
   return connection.query(`
   DELETE 
     FROM "postsHashtags"
     WHERE "postId"=$1
-  `,[id]);
+  `, [id]);
 }
 
-async function deletePostLikes(id){
+async function deletePostLikes(id) {
   return connection.query(`
   DELETE 
     FROM likes
     WHERE "postId"=$1
-  `,[id]);
+  `, [id]);
 }
 
-async function findPost(id){
+async function findPost(id) {
   return connection.query(`
     SELECT * FROM posts
     WHERE id = $1
@@ -75,7 +95,7 @@ async function updatePost(id, text) {
   `, [text, id]);
 }
 
-async function getPostByHashtag(hashtag){
+async function getPostByHashtag(hashtag) {
   return connection.query(`
   SELECT hashtags."hashtagText", hashtags.id AS "hashtagId",
    posts.id AS "id",posts.link,posts."textPost",posts."userId",posts.date,users.name AS "userName",
@@ -88,10 +108,10 @@ async function getPostByHashtag(hashtag){
 			        JOIN users
 			        	ON posts."userId"=users.id
     WHERE hashtags."hashtagText"=$1
-  `,[hashtag]);
+  `, [hashtag]);
 }
 
-async function getLikesPostById(postId,userId) {
+async function getLikesPostById(postId, userId) {
   return connection.query(`
     SELECT likes."postId", likes."userId", users.name
     FROM likes
@@ -144,7 +164,14 @@ async function getMetadataByLink(link) {
     WHERE link = $1
   `, [link]);
 }
- 
+
+async function countFollows(userId){
+  return await connection.query(`
+  SELECT COUNT("followingId") AS following 
+    FROM follows
+      WHERE "userId"=$1
+  `,[userId]);
+}
 export const postsRepository = {
   create,
   getTimeline,
@@ -162,6 +189,7 @@ export const postsRepository = {
   createMetadata,
   getMetadataByLink,
   deletePostLikes,
+  countFollows
 };
 
 
