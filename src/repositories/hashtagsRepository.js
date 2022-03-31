@@ -1,7 +1,7 @@
 import connection from "../db.js";
 
 async function findHashtag(hashtag) {
-  return connection.query(
+  return await connection.query(
     `
    SELECT * 
    FROM hashtags 
@@ -12,7 +12,7 @@ async function findHashtag(hashtag) {
 }
 
 async function createHashtag(hashtag) {
-  connection.query(
+  return await connection.query(
     `
          INSERT INTO hashtags
          ("hashtagText")
@@ -23,7 +23,7 @@ async function createHashtag(hashtag) {
 }
 
 async function getHashtagId(hashtag) {
-  return connection.query(
+  return await connection.query(
     `
       SELECT id 
       FROM hashtags 
@@ -34,7 +34,7 @@ async function getHashtagId(hashtag) {
 }
 
 async function getPostId({ link, text, userId }) {
-  return connection.query(
+  return await connection.query(
     `
        SELECT id 
        FROM posts
@@ -45,7 +45,7 @@ async function getPostId({ link, text, userId }) {
 }
 
 async function createPostsHashtagsEntry(hashtagId, postId) {
-  connection.query(
+  return await connection.query(
     `
           INSERT INTO "postsHashtags"
           ("hashtagId", "postId")
@@ -56,7 +56,7 @@ async function createPostsHashtagsEntry(hashtagId, postId) {
 }
 
 async function getTrendingHashtags() {
-  return connection.query(
+  return await connection.query(
     `
    SELECT 
       "hashtagId", 
