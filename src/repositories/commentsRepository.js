@@ -37,8 +37,19 @@ async function getPostComments(postId) {
   );
 }
 
+async function getUsersThatAreBeingFollowedByUserId(userId) {
+  return connection.query(
+    `
+      SELECT * FROM follows
+      WHERE "userId" = $1
+   `,
+    [userId]
+  );
+}
+
 export const commentsRepository = {
   createComment,
   getPostComments,
   getNumberOfCommentsByPostId,
+  getUsersThatAreBeingFollowedByUserId,
 };
