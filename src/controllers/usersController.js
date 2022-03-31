@@ -119,6 +119,7 @@ export async function unfollowUser(req, res) {
     res.sendStatus(500);
   }
 }
+
 export async function getFollows(req, res) {
   const { followingId } = req.params;
   const userId = res.locals.user.id;

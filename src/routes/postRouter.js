@@ -30,7 +30,7 @@ postRouter.post(
   submitPost,
   populatePostsHashtags
 );
-postRouter.get("/timeline/:id", validateToken, getTimelinePosts);
+postRouter.get("/timeline", validateToken, getTimelinePosts);
 postRouter.delete("/post/:id", validateToken, deletePost);
 postRouter.put(
   "/post/:id",

@@ -140,9 +140,10 @@ export async function populatePostsHashtags(req, res) {
 }
 
 export async function getTimelinePosts(req, res) {
-  const userId=res.locals.user.id;
+  const { id } = res.locals.user
+  
   try {
-    const { rows: posts } = await postsRepository.getTimeline(userId);
+    const { rows: posts } = await postsRepository.getTimeline(id);
 
     const postsResponse = [];
     for (const post of posts) {
@@ -221,9 +222,10 @@ export async function deletePost(req, res) {
 
 export async function getPostByHashtag(req, res) {
   const { hashtag } = req.params;
+  const { offset } = req.query;
 
   try {
-    const { rows: result } = await postsRepository.getPostByHashtag(hashtag);
+    const { rows: result } = await postsRepository.getPostByHashtag(hashtag, offset);
     if (result.rowCount === 0) {
       return res.sendStatus(404);
     }
@@ -270,18 +272,6 @@ export async function getTrendingHashtags(req, res) {
     return res.send(hashtags);
   } catch {
     console.log(error);
-    res.sendStatus(500);
-  }
-}
-
-export async function getFollowingPosts(req, res) {
-  const { id } = req.params;
-
-  try {
-    const { rows: result } = await postsRepository.getFollowingPosts(id);
-    res.status(200).send(result);
-  } catch (e) {
-    console.log(e);
     res.sendStatus(500);
   }
 }

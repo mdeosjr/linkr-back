@@ -13,11 +13,7 @@ async function create(post) {
 
 async function getTimeline(id) {
   return connection.query(`
-<<<<<<< HEAD
-   SELECT 
-=======
-  SELECT 
->>>>>>> master
+    SELECT 
       p.*,
       users.name AS "userName",
       users.image AS "userImage"
@@ -26,21 +22,9 @@ async function getTimeline(id) {
     LEFT JOIN follows f ON f."followingId"=p."userId"
    	WHERE f."userId"=$1 OR p."userId"=$1
     ORDER BY date DESC
-<<<<<<< HEAD
+    LIMIT 10
     `, [id]);
-=======
-  `,[id]);
->>>>>>> master
 }
-//   return connection.query(`
-//    SELECT 
-//       posts.*,
-//       users.name AS "userName",
-//       users.image AS "userImage"
-//    FROM posts
-//    JOIN users ON users.id = posts."userId"
-//     ORDER BY date DESC LIMIT 20`);
-// }
 
 async function selectPost(id, userId){
     return connection.query(`
@@ -180,11 +164,3 @@ export const postsRepository = {
   getMetadataByLink,
   deletePostLikes,
 };
-
-
-
-// `
-//     SELECT p.id as "postId", p."userId", f."userId" as "followerId" FROM posts p
-// 	    LEFT JOIN follows f ON f."followingId"=p."userId"
-// 	    WHERE f."userId"=$1 OR p."userId"=$1
-//   `
