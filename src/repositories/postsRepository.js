@@ -11,7 +11,7 @@ async function create(post) {
   );
 }
 
-async function getTimeline(id) {
+async function getTimeline(id, offset) {
   return connection.query(`
    SELECT 
       p.*,
@@ -22,7 +22,9 @@ async function getTimeline(id) {
     LEFT JOIN follows f ON f."followingId"=p."userId"
    	WHERE f."userId"=$1 OR p."userId"=$1
     ORDER BY date DESC
-    `, [id]);
+    LIMIT 10
+    OFFSET $2
+    `, [id, offset]);
 }
 
 async function selectPost(id, userId){
