@@ -131,10 +131,12 @@ export async function populatePostsHashtags(req, res) {
         hashtag
       );
 
-      await hashtagsRepository.createPostsHashtagsEntry(
-        hashtagId[0]?.id,
-        postId[0]?.id
-      );
+      if (hashtagId.length > 0 && postId.length > 0) {
+        await hashtagsRepository.createPostsHashtagsEntry(
+          hashtagId[0]?.id,
+          postId[0]?.id
+        );
+      }
     }
   }
 }
