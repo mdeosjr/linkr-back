@@ -5,7 +5,7 @@ async function create(post) {
     `
         INSERT INTO posts
         (link, "textPost", "userId")
-        VALUES ($1, $2, $3)
+        VALUES ($1, $2, $3) RETURNING id
     `,
     [post.link, post.text, post.userId]
   );
@@ -110,6 +110,7 @@ async function getPostByHashtag(hashtag) {
 			        JOIN users
 			        	ON posts."userId"=users.id
     WHERE hashtags."hashtagText"=$1
+    ORDER BY id DESC
   `,
     [hashtag]
   );

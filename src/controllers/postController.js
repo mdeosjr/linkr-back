@@ -88,7 +88,8 @@ export async function submitPost(req, res, next) {
       text,
       userId,
     };
-    await postsRepository.create(post);
+    const { rows: postId } = await postsRepository.create(post);
+
     await postsRepository.createMetadata(link, metaDataUrl);
 
     if (hashtags !== null) {
@@ -101,7 +102,7 @@ export async function submitPost(req, res, next) {
         }
       }
     }
-
+    res.locals.postId = postId[0].id;
     res.sendStatus(201);
     next();
   } catch (error) {
@@ -111,17 +112,10 @@ export async function submitPost(req, res, next) {
 }
 
 export async function populatePostsHashtags(req, res) {
-  const { link, text } = req.body;
-  const userId = res.locals.user.id;
+  const { text } = req.body;
+
   const hashtags = text.match(/#\w+/g);
-
-  const post = {
-    link,
-    text,
-    userId,
-  };
-
-  const { rows: postId } = await hashtagsRepository.getPostId(post);
+  const { postId } = res.locals;
 
   if (hashtags !== null) {
     for (const value of hashtags) {
@@ -131,10 +125,10 @@ export async function populatePostsHashtags(req, res) {
         hashtag
       );
 
-      if (hashtagId.length > 0 && postId.length > 0) {
+      if (hashtagId.length > 0 && postId) {
         await hashtagsRepository.createPostsHashtagsEntry(
           hashtagId[0]?.id,
-          postId[0]?.id
+          postId
         );
       }
     }
@@ -229,6 +223,7 @@ export async function getPostByHashtag(req, res) {
     if (result.rowCount === 0) {
       return res.sendStatus(404);
     }
+
     const postsResponse = [];
     for (const post of result) {
       const {
@@ -259,6 +254,7 @@ export async function getPostByHashtag(req, res) {
         usersLikes: likes.rows.map((like) => like.name),
       });
     }
+
     res.send(postsResponse);
   } catch (error) {
     console.log(error);
