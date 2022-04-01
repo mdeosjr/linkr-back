@@ -11,6 +11,7 @@ import {
   submitLike,
   submitUnlike,
   countFollows,
+  submitRepost,
 } from "../controllers/postController.js";
 import postSchema from "../schemas/postSchema.js";
 import validateSchema from "../middlewares/validateSchemaMW.js";
@@ -47,5 +48,6 @@ postRouter.delete("/likes/:postId", validateToken, submitUnlike);
 postRouter.post("/comments/create", validateToken, createComment);
 postRouter.get("/comments/:postId", validateToken, getPostComments);
 postRouter.get("/countfollows",validateToken,countFollows);
+postRouter.post("/repost/:postId", validateToken, submitRepost);
 
 export default postRouter;

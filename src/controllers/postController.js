@@ -137,10 +137,10 @@ export async function populatePostsHashtags(req, res) {
 
 export async function getTimelinePosts(req, res) {
   const userId = res.locals.user.id;
-  const { offset } = req.query;
+  const { limit } = req.query;
 
   try {
-    const { rows: posts } = await postsRepository.getTimeline(userId, offset);
+    const { rows: posts } = await postsRepository.getTimeline(userId, limit);
     const { rows: [{countPosts}] } = await postsRepository.countPosts(userId);
     const count = parseInt(countPosts)
 
@@ -181,6 +181,9 @@ export async function getTimelinePosts(req, res) {
         newLikes[indexOfUser] = aux;
       }
 
+      const { rows: [numberOfReposts] } = 
+        await postsRepository.getNumberOfRepostsByPostId(post.id);
+
       postsResponse.push({
         ...post,
         linkTitle: metadata.linkTitle,
@@ -190,7 +193,9 @@ export async function getTimelinePosts(req, res) {
         liked: liked,
         comments: comments[0].numberOfComments,
         usersLikes: newLikes,
-        countPosts: count
+        countPosts: count,
+        reposts: numberOfReposts.numberOfReposts,
+        usersLikes: newLikes
       });
     }
     res.send(postsResponse);
@@ -209,8 +214,9 @@ export async function deletePost(req, res) {
     }
     const post = result.rows[0].postHashtagId;
     await postsRepository.deletePostLikes(id);
+    await postsRepository.deleteRespost(id);
     if (post !== null) {
-      await postsRepository.deletePostHashtags(id);
+      await postsRepository.deletePostHashtags(id);      
     }
     await postsRepository.deletePost(id);
     return res.sendStatus(200);
@@ -299,5 +305,18 @@ export async function countFollows(req,res){
     console.log(error);
     res.sendStatus(500);
     
+  }
+}
+
+export async function submitRepost(req, res){
+  const userId = res.locals.user.id;
+  const userName = res.locals.user.name;
+  const postId = req.params.postId;
+  try {
+    await postsRepository.submitRepost(postId, userId, userName);
+    res.sendStatus(200);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
   }
 }
