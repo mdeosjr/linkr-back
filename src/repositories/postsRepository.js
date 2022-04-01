@@ -207,6 +207,16 @@ async function countFollows(userId){
   `,[userId]);
 }
 
+async function deleteRespost(id) {
+  return connection.query(
+    `
+  DELETE 
+    FROM reposts
+    WHERE "postId"=$1
+  `,
+    [id]
+  );
+}
 export const postsRepository = {
   create,
   getTimeline,
@@ -224,5 +234,6 @@ export const postsRepository = {
   createMetadata,
   getMetadataByLink,
   deletePostLikes,
-  countFollows
+  countFollows,
+  deleteRespost
 };
