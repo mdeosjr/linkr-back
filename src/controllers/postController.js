@@ -210,8 +210,9 @@ export async function deletePost(req, res) {
     }
     const post = result.rows[0].postHashtagId;
     await postsRepository.deletePostLikes(id);
+    await postsRepository.deleteRespost(id);
     if (post !== null) {
-      await postsRepository.deletePostHashtags(id);
+      await postsRepository.deletePostHashtags(id);      
     }
     await postsRepository.deletePost(id);
     return res.sendStatus(200);

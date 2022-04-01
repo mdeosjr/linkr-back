@@ -222,6 +222,16 @@ async function submitRepost(postId, reposterId, reposterName) {
 
 }
 
+async function deleteRespost(id) {
+  return connection.query(
+    `
+  DELETE 
+    FROM reposts
+    WHERE "postId"=$1
+  `,
+    [id]
+  );
+}
 export const postsRepository = {
   create,
   getTimeline,
@@ -241,5 +251,6 @@ export const postsRepository = {
   deletePostLikes,
   countFollows,
   getNumberOfRepostsByPostId,
-  submitRepost
+  submitRepost,
+  deleteRespost,
 };
