@@ -137,10 +137,12 @@ export async function populatePostsHashtags(req, res) {
 
 export async function getTimelinePosts(req, res) {
   const userId = res.locals.user.id;
-  const { offset } = req.query;
+  const { limit } = req.query;
 
   try {
-    const { rows: posts } = await postsRepository.getTimeline(userId, offset);
+    const { rows: posts } = await postsRepository.getTimeline(userId, limit);
+    const { rows: [{countPosts}] } = await postsRepository.countPosts(userId);
+    const count = parseInt(countPosts)
 
     const postsResponse = [];
     for (const post of posts) {
@@ -190,6 +192,8 @@ export async function getTimelinePosts(req, res) {
         likes: likes.rowCount,
         liked: liked,
         comments: comments[0].numberOfComments,
+        usersLikes: newLikes,
+        countPosts: count,
         reposts: numberOfReposts.numberOfReposts,
         usersLikes: newLikes
       });
