@@ -42,7 +42,7 @@ CREATE TABLE "postsMetadata"(
     "link" TEXT NOT NULL,
     "linkTitle" TEXT DEFAULT '',
     "linkDescription" TEXT DEFAULT '',
-    "linkImage" TEXT DEFAULT 'https://svgur.com/i/fhk.svg'
+    "linkImage" TEXT DEFAULT 'https://linkr-api-sql.herokuapp.com/assets/DefaultImage.svg'
 );
 CREATE TABLE "follows"(
     "id" SERIAL NOT NULL PRIMARY KEY,
