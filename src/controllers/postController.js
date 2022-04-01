@@ -141,6 +141,8 @@ export async function getTimelinePosts(req, res) {
 
   try {
     const { rows: posts } = await postsRepository.getTimeline(userId, offset);
+    const { rows: [{countPosts}] } = await postsRepository.countPosts(userId);
+    const count = parseInt(countPosts)
 
     const postsResponse = [];
     for (const post of posts) {
@@ -188,6 +190,7 @@ export async function getTimelinePosts(req, res) {
         liked: liked,
         comments: comments[0].numberOfComments,
         usersLikes: newLikes,
+        countPosts: count
       });
     }
     res.send(postsResponse);
