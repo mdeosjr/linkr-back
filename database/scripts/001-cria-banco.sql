@@ -52,7 +52,9 @@ CREATE TABLE "follows"(
 CREATE TABLE "reposts"(
     "id" SERIAL NOT NULL PRIMARY KEY,
     "postId" INTEGER NOT NULL REFERENCES "posts"("id"),
-    "reposterId" INTEGER NOT NULL REFERENCES "users"("id")
+    "reposterId" INTEGER NOT NULL REFERENCES "users"("id"),
+    "reposterName" TEXT NOT NULL,
+    date TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 CREATE TABLE "comments"(
     "id" SERIAL NOT NULL PRIMARY KEY,

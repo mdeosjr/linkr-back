@@ -11,29 +11,28 @@ async function create(post) {
   );
 }
 
-async function getTimeline(id, offset) {
+async function getTimeline(id) {
   return connection.query(`
-  select p.* ,
-  f."followingId",
-  u.name as "userName", u.image as "userImage",  
-  Null as "reposterId"
-  from posts p
-  join follows f on f."userId" = $1
-  join users u on u.id = p."userId"
-  where p."userId" = f."followingId"
-  UNION ALL
-  select 
-  p.*, 
-  follows."followingId",
-  u.name, u.image, r."reposterId"
-  from follows 
-  join reposts r on r."reposterId" = follows."followingId"
-  join posts p on p.id = r."postId"
-  join users u on u.id = r."reposterId"
-  WHERE follows."userId" = $1
-  LIMIT 10
-    OFFSET $2
-    `,[id,offset]);
+    select p.* ,
+    f."followingId",
+    u.name as "userName", u.image as "userImage",  
+    Null as "reposterId", date as "reposterDate", Null as "reposterName", Null as "repostId"
+    from posts p
+    join follows f on f."userId" = $1
+    join users u on u.id = p."userId"
+    where p."userId" = f."followingId"
+    UNION ALL
+    select 
+    p.*, 
+    follows."followingId",
+    name as "userName", image as "userImage", r."reposterId", r."date" as "reposterDate", r."reposterName", r.id as "repostId"
+    from follows 
+    join reposts r on r."reposterId" = follows."followingId"
+    join posts p on p.id = r."postId"
+    join users u on u.id = p."userId"
+    WHERE follows."userId" = $1 or r."reposterId" = $1
+    ORDER BY "reposterDate" DESC
+    `,[id]);
 }
 
 async function selectPost(id, userId) {
@@ -207,6 +206,22 @@ async function countFollows(userId){
   `,[userId]);
 }
 
+async function getNumberOfRepostsByPostId(postId) {
+  return connection.query(`
+    SELECT COUNT(reposts."postId") AS "numberOfReposts"
+    FROM reposts 
+    WHERE reposts."postId" = $1
+  `, [postId])
+}
+
+async function submitRepost(postId, reposterId, reposterName) {
+  return connection.query(`
+    INSERT INTO reposts ("postId", "reposterId", "reposterName")
+    VALUES ($1, $2, $3)
+  `, [postId, reposterId, reposterName])
+
+}
+
 export const postsRepository = {
   create,
   getTimeline,
@@ -224,5 +239,7 @@ export const postsRepository = {
   createMetadata,
   getMetadataByLink,
   deletePostLikes,
-  countFollows
+  countFollows,
+  getNumberOfRepostsByPostId,
+  submitRepost
 };
