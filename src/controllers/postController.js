@@ -179,6 +179,9 @@ export async function getTimelinePosts(req, res) {
         newLikes[indexOfUser] = aux;
       }
 
+      const { rows: [numberOfReposts] } = 
+        await postsRepository.getNumberOfRepostsByPostId(post.id);
+
       postsResponse.push({
         ...post,
         linkTitle: metadata.linkTitle,
@@ -187,7 +190,8 @@ export async function getTimelinePosts(req, res) {
         likes: likes.rowCount,
         liked: liked,
         comments: comments[0].numberOfComments,
-        usersLikes: newLikes,
+        reposts: numberOfReposts.numberOfReposts,
+        usersLikes: newLikes
       });
     }
     res.send(postsResponse);
@@ -297,5 +301,18 @@ export async function countFollows(req,res){
     console.log(error);
     res.sendStatus(500);
     
+  }
+}
+
+export async function submitRepost(req, res){
+  const userId = res.locals.user.id;
+  const userName = res.locals.user.name;
+  const postId = req.params.postId;
+  try {
+    await postsRepository.submitRepost(postId, userId, userName);
+    res.sendStatus(200);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
   }
 }
